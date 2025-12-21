@@ -16,6 +16,9 @@ python src/app.py
 ```
 Paste Python code, then finish with a line containing only `END`.
 
+## Screenshot
+![Terminal visualizer screenshot](screenshots/screenshot_0.png)
+
 Example input:
 ```python
 total = 0
