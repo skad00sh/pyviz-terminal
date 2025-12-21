@@ -6,6 +6,7 @@ import sys
 
 USER_FILENAME = "<user_code>"
 MAX_STEPS = 1000
+EXCLUDED_LOCALS = {"__builtins__", "__name__"}
 
 
 class StepLimitReached(Exception):
@@ -47,6 +48,8 @@ def trace_code(code):
                 raise StepLimitReached(f"Step limit {MAX_STEPS} reached.")
             locals_snapshot = {}
             for key in sorted(frame.f_locals.keys()):
+                if key in EXCLUDED_LOCALS:
+                    continue
                 locals_snapshot[key] = safe_repr(frame.f_locals.get(key))
             steps.append(
                 {
