@@ -16,6 +16,11 @@ python src/app.py
 ```
 Paste Python code, then finish with a line containing only `END`.
 
+## Streamlit UI
+```bash
+streamlit run src/streamlit_app.py
+```
+
 ## Screenshot
 ![Terminal visualizer screenshot](screenshots/screenshot_0.png)
 
