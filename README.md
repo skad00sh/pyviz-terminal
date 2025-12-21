@@ -20,9 +20,11 @@ Paste Python code, then finish with a line containing only `END`.
 ```bash
 streamlit run src/streamlit_app.py
 ```
+Live demo: https://pyviz-terminal.streamlit.app/
 
 ## Screenshot
 ![Terminal visualizer screenshot](screenshots/screenshot_0.png)
+![Streamlit UI screenshot](screenshots/streamlit_0.png)
 
 Example input:
 ```python
