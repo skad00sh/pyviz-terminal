@@ -100,23 +100,31 @@ def clamp(value, low, high):
     return max(low, min(high, value))
 
 
+def compute_code_height(height, header_lines):
+    available = height - header_lines - 2
+    if available < 1:
+        return 0
+    min_height = min(6, available)
+    ideal = int((height - header_lines - 1) * 0.55)
+    return clamp(ideal, min_height, available)
+
+
 def draw_view(stdscr, code_lines, steps, output_text, current_step, top_line):
     stdscr.erase()
     height, width = stdscr.getmaxyx()
 
     header_lines = 2
+    code_height = compute_code_height(height, header_lines)
     stdscr.addstr(0, 0, "Python Code Visualizer in Terminal)")
     stdscr.addstr(
         1, 0, "Keys: n/Right/Down next, p/Left/Up prev, q quit"
     )
 
-    if height < 8 or width < 40:
+    if height < 8 or width < 40 or code_height == 0:
         stdscr.addstr(3, 0, "Window too small.")
         stdscr.refresh()
         return top_line
 
-    code_height = max(6, int((height - header_lines - 1) * 0.55))
-    code_height = clamp(code_height, 6, height - header_lines - 3)
     divider_y = header_lines + code_height
     stdscr.hline(divider_y, 0, "-", width)
 
@@ -199,7 +207,8 @@ def run_viewer(code, steps, output_text):
         stdscr.keypad(True)
 
         height, width = stdscr.getmaxyx()
-        code_height = max(6, int((height - 3) * 0.55))
+        header_lines = 2
+        code_height = compute_code_height(height, header_lines)
 
         top_line = adjust_top_line(
             current_step, steps, code_height, top_line, len(code_lines)
@@ -221,7 +230,7 @@ def run_viewer(code, steps, output_text):
                     current_step -= 1
 
             height, width = stdscr.getmaxyx()
-            code_height = max(6, int((height - 3) * 0.55))
+            code_height = compute_code_height(height, header_lines)
             top_line = adjust_top_line(
                 current_step, steps, code_height, top_line, len(code_lines)
             )
