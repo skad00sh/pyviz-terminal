@@ -2,7 +2,7 @@ import html
 
 import streamlit as st
 
-from app import trace_code
+from pyviz_terminal.app import trace_code
 
 
 st.set_page_config(page_title="Python Code Visualizer", layout="wide")
