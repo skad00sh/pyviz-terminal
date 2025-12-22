@@ -1,3 +1,5 @@
+import html
+
 import streamlit as st
 
 from app import trace_code
@@ -16,6 +18,33 @@ def format_code(code_lines, current_lineno):
         marker = ">>" if lineno == current_lineno else "  "
         rendered.append(f"{marker} {lineno:>4} {line}")
     return "\n".join(rendered)
+
+
+def render_small_table(headers, rows):
+    header_html = "".join(
+        "<th style='text-align:left;padding:2px 6px;border-bottom:1px solid #ddd;'>"
+        + html.escape(str(header))
+        + "</th>"
+        for header in headers
+    )
+    row_html = "".join(
+        "<tr>"
+        + "".join(
+            "<td style='padding:2px 6px;border-bottom:1px solid #f0f0f0;'>"
+            + html.escape(str(cell))
+            + "</td>"
+            for cell in row
+        )
+        + "</tr>"
+        for row in rows
+    )
+    table_html = (
+        "<table style='font-size:0.85em;border-collapse:collapse;margin-bottom:6px;'>"
+        f"<thead><tr>{header_html}</tr></thead>"
+        f"<tbody>{row_html}</tbody>"
+        "</table>"
+    )
+    st.markdown(table_html, unsafe_allow_html=True)
 
 
 st.title("Python Code Visualizer")
@@ -43,7 +72,19 @@ if steps is not None:
         code_lines = stored_code.splitlines()
         st.code(format_code(code_lines, step["lineno"]))
         st.subheader("Locals")
-        st.json(step["locals"])
+        for name, entry in step["locals"].items():
+            list_items = entry.get("list_items")
+            dict_items = entry.get("dict_items")
+            if list_items is not None:
+                st.markdown(f"**{name}**")
+                rows = [(index, value) for index, value in enumerate(list_items)]
+                render_small_table(["index", "value"], rows)
+            elif dict_items is not None:
+                st.markdown(f"**{name}**")
+                rows = [(key, value) for key, value in dict_items]
+                render_small_table(["key", "value"], rows)
+            else:
+                st.text(f"{name} = {entry['repr']}")
 
     st.subheader("Output")
     st.text(output_text or "<no output>")

@@ -50,7 +50,18 @@ def trace_code(code):
             for key in sorted(frame.f_locals.keys()):
                 if key in EXCLUDED_LOCALS:
                     continue
-                locals_snapshot[key] = safe_repr(frame.f_locals.get(key))
+                value = frame.f_locals.get(key)
+                entry = {"repr": safe_repr(value)}
+                if isinstance(value, list):
+                    entry["list_items"] = [
+                        safe_repr(item) for item in value
+                    ]
+                elif isinstance(value, dict):
+                    entry["dict_items"] = [
+                        (safe_repr(k), safe_repr(v))
+                        for k, v in value.items()
+                    ]
+                locals_snapshot[key] = entry
             steps.append(
                 {
                     "lineno": frame.f_lineno,
@@ -158,7 +169,9 @@ def draw_view(stdscr, code_lines, steps, output_text, current_step, top_line):
     locals_lines = ["<no steps>"]
     if steps:
         locals_dict = steps[current_step]["locals"]
-        locals_lines = [f"{k} = {v}" for k, v in locals_dict.items()]
+        locals_lines = [
+            f"{k} = {entry['repr']}" for k, entry in locals_dict.items()
+        ]
         if not locals_lines:
             locals_lines = ["<no locals>"]
 
